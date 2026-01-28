@@ -1,7 +1,7 @@
 #define BOOST_TEST_DYN_LINK
+#include <Eigen/Dense>
 #include <boost/test/unit_test.hpp>
 #include "matrixIO.hpp"
-#include <Eigen/Dense>
 
 using namespace Eigen;
 
@@ -11,8 +11,9 @@ BOOST_AUTO_TEST_CASE(OpenData)
 {
   const int      expectedMatrixSize{3};
   const MatrixXd expectedMatrix = (MatrixXd(3, 3) << 0.680375, 0.59688, -0.329554,
-                                                      -0.211234, 0.823295, 0.536459,
-                                                      0.566198, -0.604897, -0.444451).finished();
+                                   -0.211234, 0.823295, 0.536459,
+                                   0.566198, -0.604897, -0.444451)
+                                      .finished();
 
   MatrixXd matrix = matrixIO::openData("../data/m3.csv", expectedMatrixSize);
 
