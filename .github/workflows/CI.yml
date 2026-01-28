@@ -1,0 +1,64 @@
+name: SSE tesinting-boost-exercise
+
+on:
+  push, pull_request
+
+jobs:
+  Style:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install clang-format
+      run: sudo apt-get install -y clang-format
+    
+    - name: Check C++ and header file formatting
+      run: clang-format --dry-run -Werror $(find src tests -name "*.cpp" -o -name "*.hpp")
+
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libeigen3-dev libyaml-cpp-dev libboost-test-dev
+    
+    - name: Create build directory
+      run: mkdir build
+    
+    - name: Configure CMake
+      working-directory: build
+      run: cmake ..
+    
+    - name: Build
+      working-directory: build
+      run: make -j
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build
+        path: build/
+
+  Test:
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libeigen3-dev libyaml-cpp-dev libboost-test-dev
+    
+    - name: Download build artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: build
+        path: build/
+    
+    - name: Run tests
+      working-directory: build
+      run: ctest --output-on-failure
